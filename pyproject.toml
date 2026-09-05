@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "awembed"
+version = "0.1.0"
+description = "Train a small embedding model that knows your corpus: teacher capture, distillation, fidelity-gated int8, held-out eval -- one CLI, every stage gated."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+keywords = ["embeddings", "distillation", "retrieval", "code-search", "quantization"]
+dependencies = [
+    "numpy>=1.24",
+    "torch>=2.1",
+    "transformers>=4.51",
+]
+
+[project.optional-dependencies]
+# The teacher server (an OpenAI-compatible /v1/embeddings endpoint for a large model).
+teacher = ["fastapi>=0.100", "uvicorn>=0.23", "einops", "datasets", "accelerate"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+awembed = "awembed.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Aitherium/awembed"
+Documentation = "https://github.com/Aitherium/awembed#readme"
+Repository = "https://github.com/Aitherium/awembed.git"
+Issues = "https://github.com/Aitherium/awembed/issues"
+
+[tool.setuptools]
+packages = ["awembed"]
+license-files = ["LICENSE"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
