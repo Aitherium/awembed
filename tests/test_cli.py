@@ -53,13 +53,7 @@ def test_no_internal_identifiers_ship():
     # The package is public. A monorepo path or a fleet hostname in a docstring reads
     # as authoritative to a stranger and points at nothing they have.
     import re
-    # The needles are ASSEMBLED, never written whole. This file ships inside the
-    # sdist, so a literal fleet hostname or monorepo path HERE is itself the
-    # disclosure the test exists to prevent -- and the publish gate is right to
-    # refuse it -- the publish boundary scan flagged exactly this line. Splitting
-    # test doing its job while leaving no searchable internal string in the artifact.
-    needles = ["Aither" + "OS/", "aitheros" + "-", "/app" + "/", "/lambda" + "/nfs"]
-    pat = re.compile("|".join(re.escape(n) for n in needles) + r"|\bD-\d{3,4}\b")
+    pat = re.compile(r"AitherOS/|aitheros-|/app/|/lambda/nfs|\bD-\d{3,4}\b")
     hits = []
     for p in sorted((PKG / "awembed").glob("*.py")):
         for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
