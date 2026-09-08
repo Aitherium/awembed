@@ -5,7 +5,7 @@
   "url": "https://aitherium.github.io/awembed/",
   "repository": "https://github.com/Aitherium/awembed",
   "kind": "tool",
-  "status": "unpublished",
+  "status": "public",
   "adopt": "Point it at one repo and get a 0.6B embedder that ranks your directories better than the 7B one it learned from, with the eval that proves it.",
   "pairs_with": [
     "awdk",
@@ -17,5 +17,15 @@
     "awsh",
     "awskills"
   ],
-  "includes": []
+  "includes": [],
+  "metrics": {
+    "files": {
+      "value": 19,
+      "as_of": "2026-09-06T20:01:00-07:00"
+    },
+    "tests": {
+      "value": 1,
+      "as_of": "2026-09-06T20:01:00-07:00"
+    }
+  }
 }
