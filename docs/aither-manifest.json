@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1",
+  "name": "awembed",
+  "description": "Train an embedding model that knows your corpus, and prove it beats the big one.",
+  "url": "https://aitherium.github.io/awembed/",
+  "repository": "https://github.com/Aitherium/awembed",
+  "kind": "tool",
+  "status": "public",
+  "adopt": "Point it at one repo and get a 0.6B embedder that ranks your directories better than the 7B one it learned from, with the eval that proves it.",
+  "pairs_with": [
+    "awdk",
+    "awgraph",
+    "awm",
+    "awfind",
+    "awrecurse",
+    "awrepl",
+    "awsh",
+    "awskills"
+  ],
+  "includes": [],
+  "metrics": {
+    "files": {
+      "value": 19,
+      "as_of": "2026-09-08T07:32:44-07:00"
+    },
+    "tests": {
+      "value": 1,
+      "as_of": "2026-09-08T07:32:44-07:00"
+    }
+  }
+}
