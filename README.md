@@ -105,6 +105,44 @@ It pairs with the rest of the Aither World family: `awgraph` (code graph search 
 your repo), `awm` (agent memory), `awfind` (ranked answers), `awrecurse` (documents
 larger than a context window), and `awdk` agents that consume any of those.
 
+## Prove it against the others
+
+`awembed eval` scores your student against the teacher it learned from. `awembed compare`
+scores **any served embedders** on **your** documents — black-box, over OpenAI-shaped
+`/v1/embeddings`, so the student and every third-party model are measured by the same
+code on the same rows:
+
+```bash
+awembed compare --corpus docs.jsonl --queries queries.jsonl \
+  --endpoint student=http://127.0.0.1:18101 \
+  --endpoint nomic=http://127.0.0.1:18103 \
+  --qprefix nomic="search_query: " --dprefix nomic="search_document: " \
+  --out compare.json
+```
+
+Prefixes are per endpoint, because the conventions differ and they move the numbers.
+
+**Measured 2026-09-10** on 26 real chunks of a customer's engineering documents
+(6 files), 28 queries — 7 real questions users had asked of that corpus, 21 written for
+even coverage. Metrics are document-level (a hit is the top-ranked chunk's document), so
+a chunker cannot flatter or punish a model:
+
+| endpoint | dims | p@1 | doc@3 | MRR |
+|---|---|---|---|---|
+| student (this tool's output) | 1024 | **0.893** | 1.000 | **0.940** |
+| Qwen3-Embedding-0.6B (raw) | 1024 | 0.821 | 0.964 | 0.900 |
+| nomic-embed-text-v1.5 (`search_*` prefixes) | 768 | 0.821 | 1.000 | 0.899 |
+| all-MiniLM-L6-v2 (the 384-d fallback that was serving that corpus) | 384 | 0.750 | 0.964 | 0.851 |
+| student truncated to 256-d (the volunteer-compute form) | 256 | 0.821 | 1.000 | 0.905 |
+
+Two findings worth carrying: a student distilled for **code** search transferred to
+**prose** — the code-search query prefix changed nothing on documents either way — and
+truncating to 256-d costs real questions (p@1 0.714 → 0.429), so keep the full width for
+retrieval and use the narrow form only where it is verifying agreement, not ranking.
+
+Caveat, stated: 28 queries over 6 documents makes a two-query gap directional, not
+significant. Rerun it on your own corpus before you switch anything.
+
 ## Licence
 
 Apache-2.0. Models you train carry their base model's licence.

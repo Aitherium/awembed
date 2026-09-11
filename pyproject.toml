@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "awembed"
-version = "0.1.0"
+version = "0.1.1"
 description = "Train a small embedding model that knows your corpus: teacher capture, distillation, fidelity-gated int8, held-out eval -- one CLI, every stage gated."
 readme = "README.md"
 requires-python = ">=3.10"

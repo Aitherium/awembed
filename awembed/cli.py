@@ -7,6 +7,7 @@
     awembed distill   train the small student against the teacher + the corpus labels
     awembed quantize  weight-only int8 export with a fidelity gate
     awembed eval      teacher vs baseline vs student vs int8 on the held-out split
+    awembed compare   score any served embedders on YOUR corpus, black-box
     awembed run       capture -> distill -> quantize -> eval, in order, one output root
 
 Every stage is a standalone module with its own `--self-test` and its own gate that
@@ -28,6 +29,7 @@ STAGES = {
     "distill": ("awembed.distill", "train the student against teacher margins + labels"),
     "quantize": ("awembed.quantize", "weight-only int8 export, fidelity-gated"),
     "eval": ("awembed.evaluate", "teacher / baseline / student / int8 on the held-out split"),
+    "compare": ("awembed.compare", "score any served embedders on YOUR corpus, black-box"),
 }
 PIPELINE = ("capture", "distill", "quantize", "eval")
 
