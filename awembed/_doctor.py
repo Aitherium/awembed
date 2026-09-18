@@ -23,7 +23,7 @@ import sys
 #: package cannot read the registry, and a doctor that guessed at the family
 #: would go stale in silence. Regenerate to update.
 SELF = 'awembed'
-FAMILY = ['awask', 'awbac', 'awbrain', 'awbrowse', 'awclassify', 'awdelphi', 'awdit', 'awevolve', 'awfind', 'awfocus', 'awgit', 'awgraph', 'awgym', 'awiam', 'awkno', 'awm', 'awmail', 'awnboard', 'awnest', 'awnet', 'awnode', 'awpredict', 'awprism', 'awreason', 'awrecover', 'awrecurse', 'awrelay', 'awrena', 'awrepl', 'awresearch', 'awrise', 'awrouter', 'awrtifact', 'awrun', 'awscreen', 'awseal', 'awshare', 'awstorage', 'awswarm', 'awtoll', 'awtunnel', 'awvision', 'awvoice', 'awwall']
+FAMILY = ['awask', 'awavatar', 'awbac', 'awbrain', 'awbrowse', 'awclassify', 'awdecide', 'awdelphi', 'awdit', 'awevolve', 'awfind', 'awflow', 'awfocus', 'awgit', 'awgraph', 'awgym', 'awiam', 'awkno', 'awm', 'awmail', 'awnboard', 'awnest', 'awnet', 'awpool', 'awpredict', 'awprism', 'awprove', 'awreason', 'awrecover', 'awrecurse', 'awrelay', 'awrena', 'awrepl', 'awreport', 'awresearch', 'awrise', 'awrouter', 'awrtifact', 'awrun', 'awscreen', 'awseal', 'awsettings', 'awshare', 'awsprite', 'awstorage', 'awswarm', 'awtax', 'awtoll', 'awtunnel', 'awvision', 'awvoice', 'awwall', 'gawbbonet']
 PAIRS_WITH = ['adk', 'awfind', 'awgraph', 'awm', 'awrecurse', 'awrepl']
 
 #: This brick's OWN config, read out of its source at generation time.
