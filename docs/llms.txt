@@ -1,0 +1,40 @@
+# awembed
+
+> Train an embedding model that knows your corpus, and prove it beats the big one.
+
+Every agent stack searches your code with an embedding model trained on someone else's. It is right about two thirds of the time on a corpus it never saw, and nothing in the stack measures that. Distilling a small student on your own corpus -- the big model's margins plus your labels -- beats the big model, and the eval that proves it is the part people skip.
+
+## Install
+
+```
+pip install awembed
+```
+
+## In Claude Code
+
+- skill: `/awembed`
+
+## Use it in 30 seconds
+
+Point it at one repo and get a 0.6B embedder that ranks your directories better than the 7B one it learned from, with the eval that proves it.
+
+## Composes with
+
+- [awdk](https://aitherium.github.io/awdk/) — Build AI agent fleets — 3 lines, any backend, local or cloud.
+- [awgraph](https://aitherium.github.io/awgraph/) — A semantic code graph for agents — AST + tree-sitter, call graphs.
+- [awm](https://aitherium.github.io/awm/) — A portable, scoped agent memory.
+- [awfind](https://aitherium.github.io/awfind/) — A portable search client — query, results, ranking.
+- [awrecurse](https://aitherium.github.io/awrecurse/) — Answer a question over a context far larger than the window — recursively, with the trace kept.
+- [awrepl](https://aitherium.github.io/awrepl/) — A REPL an agent can actually use — state that survives between turns.
+- [awsh](https://aitherium.github.io/awsh/) — Your terminal answers you -- type a question where a command would go.
+- [awskills](https://aitherium.github.io/awskills/) — Portable agent skills — self-contained procedures an agent loads on demand.
+
+## Where it lives
+
+- Repo: https://github.com/Aitherium/awembed
+- Docs: https://aitherium.github.io/awembed/
+- Manifest (keys + the one-line adoption story): https://aitherium.github.io/awembed/aither-manifest.json
+
+This repository is mirrored from the AitherOS monorepo by `.github/workflows/sync-awembed.yml`; hand edits made here are overwritten on the next sync — change the source instead.
+
+Everything Aitherium, in one file for agents: https://aitherium.com/llms.txt
