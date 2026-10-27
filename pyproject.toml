@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "awembed"
-version = "0.1.1"
+version = "0.1.4"
 description = "Train a small embedding model that knows your corpus: teacher capture, distillation, fidelity-gated int8, held-out eval -- one CLI, every stage gated."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -19,6 +19,8 @@ dependencies = [
 [project.optional-dependencies]
 # The teacher server (an OpenAI-compatible /v1/embeddings endpoint for a large model).
 teacher = ["fastapi>=0.100", "uvicorn>=0.23", "einops", "datasets", "accelerate"]
+# `awembed serve`: the serving half, CPU or CUDA, no torch at the edge.
+serve = ["fastapi>=0.100", "uvicorn>=0.23", "onnxruntime>=1.17", "transformers>=4.40", "numpy"]
 dev = ["pytest>=7.0"]
 
 [project.scripts]
