@@ -90,10 +90,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     for name, (_, help_) in STAGES.items():
         sub.add_parser(name, help=help_, add_help=False)
     sub.add_parser("run", help="capture -> distill -> quantize -> eval", add_help=False)
+    sub.add_parser("serve", help="serve a trained embedder over /v1/embeddings",
+                   add_help=False)
     # Split at the stage name: everything after it belongs to the stage's own parser.
     head, rest = argv, []
     for i, a in enumerate(argv):
-        if a in STAGES or a == "run":
+        if a in STAGES or a in ("run", "serve"):
             head, rest = argv[: i + 1], argv[i + 1:]
             break
     ns = ap.parse_args(head)
@@ -106,6 +108,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 2
     if ns.stage == "run":
         return _run(rest)
+    if ns.stage == "serve":
+        from .serve import main as _serve
+
+        return _serve(rest)
     return _dispatch(ns.stage, rest)
 
 

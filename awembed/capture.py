@@ -87,7 +87,12 @@ class HttpTeacher:
         self.batch = min(batch, 256)  # server caps a request at 256 inputs
 
     def embed(self, texts: list[str], model: str) -> np.ndarray:
-        out = np.empty((len(texts), DIM), dtype=np.float32)
+        # The DIM is whatever the teacher returns, not a constant: the shipped teacher is
+        # 4096-d NV-Embed-v2, but "keep what you already know" is served just as well by
+        # the student's own base (Qwen3-Embedding, 1024-d), and hardcoding 4096 made that
+        # teacher raise "could not broadcast (1024,) into (4096,)" after a full encode
+        # (measured 2026-10-27). Stage 2's loss is dim-agnostic on purpose; capture must be.
+        rows: list[np.ndarray] = []
         for i in range(0, len(texts), self.batch):
             chunk = texts[i:i + self.batch]
             body = json.dumps({"model": model, "input": chunk}).encode("utf-8")
@@ -96,9 +101,19 @@ class HttpTeacher:
                 headers={"Content-Type": "application/json"}, method="POST")
             with urllib.request.urlopen(req, timeout=600) as resp:
                 data = json.loads(resp.read())["data"]
-            for d in data:
-                out[i + d["index"]] = np.asarray(d["embedding"], dtype=np.float32)
-        return out
+            ordered = sorted(data, key=lambda d: d["index"])
+            if [d["index"] for d in ordered] != list(range(len(chunk))):
+                raise SystemExit(
+                    f"[FAIL] teacher returned indices {[d['index'] for d in ordered]} "
+                    f"for a batch of {len(chunk)}"
+                )
+            rows.extend(np.asarray(d["embedding"], dtype=np.float32) for d in ordered)
+        if not rows:
+            return np.zeros((0, DIM), dtype=np.float32)
+        widths = {r.shape[0] for r in rows}
+        if len(widths) != 1:
+            raise SystemExit(f"[FAIL] teacher returned mixed widths {sorted(widths)}")
+        return np.stack(rows)
 
 
 class FakeTeacher:
@@ -127,7 +142,8 @@ def encode_sharded(teacher, texts: list[str], model: str, out_dir: Path,
     from safetensors.numpy import load_file, save_file
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    vecs = np.empty((len(texts), DIM), dtype=np.float32)
+    parts: list[np.ndarray] = []
+    dim: int | None = None
     n_shards = math.ceil(len(texts) / shard) if texts else 0
     done = skipped = 0
     for si in range(n_shards):
@@ -135,11 +151,17 @@ def encode_sharded(teacher, texts: list[str], model: str, out_dir: Path,
         chunk = texts[lo:hi]
         st = out_dir / f"shard_{si:05d}.safetensors"
         side = out_dir / f"shard_{si:05d}.json"
-        want = {"lo": lo, "hi": hi, "sha": _sha(chunk), "model": model, "dim": DIM}
+        # `dim` is deliberately NOT part of the resume key: a shard is valid when its
+        # texts and its model match, and the width is read back from the file itself.
+        want = {"lo": lo, "hi": hi, "sha": _sha(chunk), "model": model}
         if st.exists() and side.exists():
             try:
                 if json.loads(side.read_text(encoding="utf-8")) == want:
-                    vecs[lo:hi] = load_file(str(st))["emb"].astype(np.float32)
+                    emb = load_file(str(st))["emb"].astype(np.float32)
+                    dim = dim or emb.shape[1]
+                    if emb.shape[1] != dim:
+                        raise SystemExit(f"[FAIL] shard {si} width {emb.shape[1]} != {dim}")
+                    parts.append(emb)
                     skipped += 1
                     continue
             except Exception:  # noqa: BLE001 — a checkpoint that cannot be READ is work not done
@@ -147,7 +169,8 @@ def encode_sharded(teacher, texts: list[str], model: str, out_dir: Path,
                 # (found by --self-test); whatever the reason, recompute.
                 _log(f"shard {si} unreadable — recomputing")
         emb = teacher.embed(chunk, model)
-        if emb.shape != (hi - lo, DIM) or not np.isfinite(emb).all():
+        dim = dim or (emb.shape[1] if emb.ndim == 2 else None)
+        if emb.shape != (hi - lo, dim) or not np.isfinite(emb).all():
             raise SystemExit(f"[FAIL] teacher returned shape {emb.shape} / non-finite "
                              f"for shard {si} ({model})")
         # atomic: tmp -> replace, so a crash mid-write never leaves a torn shard
@@ -159,11 +182,13 @@ def encode_sharded(teacher, texts: list[str], model: str, out_dir: Path,
         save_file({"emb": emb16}, str(tmp))
         os.replace(tmp, st)
         side.write_bytes(json.dumps(want).encode("utf-8"))
-        vecs[lo:hi] = emb16.astype(np.float32)
+        parts.append(emb16.astype(np.float32))
         done += 1
     _log(f"{model}: {len(texts)} texts in {n_shards} shards "
          f"({done} encoded, {skipped} resumed)")
-    return vecs
+    if not parts:
+        return np.zeros((0, DIM), dtype=np.float32)
+    return np.concatenate(parts, axis=0)
 
 
 # --- teacher lifecycle -----------------------------------------------------------
