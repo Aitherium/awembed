@@ -10,6 +10,10 @@ Every agent stack searches your code with an embedding model trained on someone 
 pip install awembed
 ```
 
+## In Claude Code
+
+- skill: `/awembed`
+
 ## Use it in 30 seconds
 
 Point it at one repo and get a 0.6B embedder that ranks your directories better than the 7B one it learned from, with the eval that proves it.
